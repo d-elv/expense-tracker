@@ -1,5 +1,5 @@
 body {
-  /* text-align: center; */
+  font-family: monospace;
   margin: 0;
   padding: 0;
 }
@@ -26,7 +26,7 @@ body {
   margin-left: 200px;
 }
 .profile-photo {
-  width: 200px;
+  width: 180px;
   border-radius: 50%;
 }
 
@@ -52,10 +52,13 @@ body {
   cursor: pointer;
 }
 
+.transaction-container {
+  width: 100%;
+}
+
 .transactions {
   display: flex;
   flex-direction: row;
-  padding-left: 10px;
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
@@ -63,4 +66,43 @@ body {
   height: 400px;
   overflow: auto;
   border: 3px solid #023047;
+}
+
+.transactions-title {
+  padding-left: 10px;
+  background-color: black;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 13.75px;
+  padding-bottom: 13.75px;
+}
+
+.transaction-list {
+  padding-left: 0;
+  margin-top: 0;
+}
+
+li {
+  list-style: none;
+  padding-top: 8px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+}
+
+.list-item-title {
+  margin: 0;
+  padding-bottom: 8px;
+}
+
+.list-item-p {
+  margin: 0;
+}
+
+li.even {
+  background-color: #d7d7d7;
+}
+
+li.odd {
+  background-color: #a1a1a1;
 }

@@ -107,16 +107,19 @@ export const ExpenseTracker = () => {
         )}
       </div>
       <div className="transactions">
-        <div className="container">
-          <h3>Transactions</h3>
-          <ul>
-            {transactions.map((transaction) => {
+        <div className="transaction-container">
+          <h2 className="transactions-title">Transactions</h2>
+          <ul className="transaction-list">
+            {transactions.map((transaction, index) => {
               const { description, transactionAmount, transactionType } =
                 transaction;
               return (
-                <li key={description}>
-                  <h4>{description}</h4>
-                  <p>
+                <li
+                  key={description}
+                  className={index % 2 === 0 ? "even" : "odd"}
+                >
+                  <h4 className="list-item-title">{description}</h4>
+                  <p className="list-item-p">
                     £{transactionAmount} •{" "}
                     <label
                       style={{
