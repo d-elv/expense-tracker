@@ -10,8 +10,27 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-
+
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Use full path to npx
-        run: /usr/local/bin/npx firebase deploy
+        run: /usr/local/bin/npx firebase deploy --only hosting --token "${{ secrets.FIREBASE_SERVICE_ACCOUNT_EXPENSE_TRACKER_A8996 }}"
       - uses: actions/checkout@v3
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
