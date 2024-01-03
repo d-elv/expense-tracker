@@ -16,7 +16,9 @@ jobs:
           node-version: 20
 
       - name: Install npx and firebase-tools
-        run: npm install -g npx firebase-tools
+        run: |
+          npm install -g firebase-tools
+          npm install -g npx --force
 
       - name: Cache dependencies
         uses: actions/cache@v2
