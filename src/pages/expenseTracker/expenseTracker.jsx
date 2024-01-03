@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./ExpenseTracker.css";
 import { useAddTransaction } from "../../hooks/useAddTransaction.js";
 import { useGetTransactions } from "../../hooks/useGetTransactions.js";
@@ -9,9 +9,14 @@ import { auth, db } from "../../config/firebase-config.js";
 import { useNavigate } from "react-router-dom";
 
 export const ExpenseTracker = () => {
+  const { name, profilePhoto, isAuth } = useGetUserInfo();
+  useEffect(() => {
+    if (!isAuth) {
+      navigate("/");
+    }
+  });
   const { addTransaction } = useAddTransaction();
   const { transactions, transactionTotals } = useGetTransactions();
-  const { name, profilePhoto } = useGetUserInfo();
   const navigate = useNavigate();
 
   const [description, setDescription] = useState("");
@@ -187,6 +192,7 @@ export const ExpenseTracker = () => {
 // TODO:
 // 1) Add Snackbar pop up for successful sign out
 // 3) Move delete document function to its own useRemoveTransactions.js hook
+// 4) If you are directed to /expense-tracker without being logged in, you get a 404
 
 // COMPLETE
 // 2) User ability to delete transactions
