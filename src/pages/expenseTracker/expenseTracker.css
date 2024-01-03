@@ -4,6 +4,12 @@ body {
   padding: 0;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+}
+
 .expense-tracker {
   width: 100vw;
   display: flex;
@@ -16,14 +22,11 @@ body {
 .expense-tracker h1 {
   font-size: 40px;
 }
-.expense-tracker button {
-  margin-left: 10px;
-}
+
 .profile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 200px;
 }
 .profile-photo {
   width: 180px;
@@ -46,12 +49,56 @@ body {
 
 .sign-out-button:hover {
   background: #3cb0fd;
-
   background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
   text-decoration: none;
   cursor: pointer;
 }
 
+.form-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.add-transaction {
+  display: flex;
+}
+
+.radio-styling {
+  margin: 0;
+  padding-left: 4px;
+  margin-right: 2px;
+}
+
+.radio-label-styling {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 2px;
+  padding-right: 4px;
+  margin-right: 4px;
+  border: 1px solid black;
+}
+
+.radio-label-styling:first-of-type {
+  margin-left: 4px;
+}
+
+.add-transaction-button:hover {
+  cursor: pointer;
+}
+
+.remove-transactions-button {
+  background-color: #ca3f3f;
+  color: white;
+  border-radius: 2px;
+  border: none;
+}
+
+.remove-transactions-button:hover {
+  background-color: #cf2929;
+  cursor: pointer;
+}
 .transaction-container {
   width: 100%;
 }
@@ -99,10 +146,25 @@ li {
   margin: 0;
 }
 
+.list-item-info-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item-checkbox-div {
+  display: flex;
+  align-items: center;
+  margin-right: 12px;
+}
+
 li.even {
   background-color: #d7d7d7;
+  display: flex;
+  justify-content: space-between;
 }
 
 li.odd {
   background-color: #a1a1a1;
+  display: flex;
+  justify-content: space-between;
 }

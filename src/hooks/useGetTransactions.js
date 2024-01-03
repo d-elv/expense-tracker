@@ -16,7 +16,7 @@ export const useGetTransactions = () => {
     let unsubscribe;
     try {
       const queryTransactions = query(
-        transactionCollectionRef, 
+        transactionCollectionRef,
         // think where as similar to an SQL statement, this line compares userID of database entry with current logged in user
         // returning only the logged in user's documents from the firebase database.
         where("userID", "==", userID),
@@ -25,7 +25,7 @@ export const useGetTransactions = () => {
 
       // unsubscribe for clean up
       unsubscribe = onSnapshot(queryTransactions, (snapshot) => {
-        let docs = [];
+        let documents = [];
         let totalIncome = 0;
         let totalExpenses = 0;
 
@@ -33,7 +33,7 @@ export const useGetTransactions = () => {
           const data = document.data();
           const id = document.id;
 
-          docs.push({...data, id });
+          documents.push({ ...data, id });
 
           if (data.transactionType === "expense") {
             totalExpenses += Number(data.transactionAmount);
@@ -42,7 +42,7 @@ export const useGetTransactions = () => {
           }
         });
 
-        setTransactions(docs);
+        setTransactions(documents);
         let balance = totalIncome - totalExpenses;
         setTransactionTotals({
           balance,

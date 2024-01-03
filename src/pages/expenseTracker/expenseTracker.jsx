@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./ExpenseTracker.css";
 import { useAddTransaction } from "../../hooks/useAddTransaction.js";
 import { useGetTransactions } from "../../hooks/useGetTransactions.js";
 import { useGetUserInfo } from "../../hooks/useGetUserInfo.js";
 import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase-config.js";
+import { deleteDoc, doc } from "firebase/firestore";
+import { auth, db } from "../../config/firebase-config.js";
 import { useNavigate } from "react-router-dom";
 
 export const ExpenseTracker = () => {
@@ -14,8 +15,9 @@ export const ExpenseTracker = () => {
   const navigate = useNavigate();
 
   const [description, setDescription] = useState("");
-  const [transactionAmount, setTransactionAmount] = useState(0);
+  const [transactionAmount, setTransactionAmount] = useState("");
   const [transactionType, setTransactionType] = useState("expense");
+  const [checkedItems, setCheckedItems] = useState([]);
 
   const { balance, income, expenses } = transactionTotals;
 
@@ -40,6 +42,25 @@ export const ExpenseTracker = () => {
     }
   };
 
+  const handleCheckboxChange = (documentId) => {
+    setCheckedItems((prevCheckedItems) => {
+      if (prevCheckedItems.includes(documentId)) {
+        return prevCheckedItems.filter((id) => id !== documentId);
+      } else {
+        return [...prevCheckedItems, documentId];
+      }
+    });
+  };
+
+  const handleRemoveCheckedItems = async () => {
+    await Promise.all(
+      checkedItems.map(async (documentId) => {
+        const itemRef = doc(db, "transactions", documentId);
+        await deleteDoc(itemRef);
+      })
+    );
+  };
+
   return (
     <>
       <div className="expense-tracker">
@@ -60,41 +81,57 @@ export const ExpenseTracker = () => {
               <p>£{expenses}</p>
             </div>
           </div>
-          <form className="add-transaction" onSubmit={onSubmit}>
-            <input
-              type="text"
-              placeholder="Description"
-              value={description}
-              required
-              onChange={(event) => setDescription(event.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Amount"
-              value={transactionAmount}
-              required
-              onChange={(event) => setTransactionAmount(event.target.value)}
-            />
-            <input
-              type="radio"
-              id="expense"
-              value="expense"
-              required
-              checked={transactionType === "expense"}
-              onChange={(event) => setTransactionType(event.target.value)}
-            />
-            <label htmlFor="expense">Expense</label>
-            <input
-              type="radio"
-              id="income"
-              value="income"
-              required
-              checked={transactionType === "income"}
-              onChange={(event) => setTransactionType(event.target.value)}
-            />
-            <label htmlFor="income">Income</label>
-            <button type="submit">Add Transaction</button>
-          </form>
+          <div className="form-wrapper">
+            <form className="add-transaction" onSubmit={onSubmit}>
+              <input
+                type="text"
+                placeholder="Description"
+                value={description}
+                required
+                onChange={(event) => setDescription(event.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Amount"
+                value={transactionAmount}
+                required
+                onChange={(event) => setTransactionAmount(event.target.value)}
+              />
+              <div className="radio-label-styling">
+                <input
+                  className="radio-styling"
+                  type="radio"
+                  id="expense"
+                  value="expense"
+                  required
+                  checked={transactionType === "expense"}
+                  onChange={(event) => setTransactionType(event.target.value)}
+                />
+                <label htmlFor="expense">Expense</label>
+              </div>
+              <div className="radio-label-styling">
+                <input
+                  className="radio-styling"
+                  type="radio"
+                  id="income"
+                  value="income"
+                  required
+                  checked={transactionType === "income"}
+                  onChange={(event) => setTransactionType(event.target.value)}
+                />
+                <label htmlFor="income">Income</label>
+              </div>
+              <button type="submit" className="add-transaction-button">
+                Add Transaction
+              </button>
+            </form>
+            <button
+              className="remove-transactions-button"
+              onClick={handleRemoveCheckedItems}
+            >
+              Remove Transactions
+            </button>
+          </div>
         </div>
         {profilePhoto && (
           <div className="profile">
@@ -111,24 +148,32 @@ export const ExpenseTracker = () => {
           <h2 className="transactions-title">Transactions</h2>
           <ul className="transaction-list">
             {transactions.map((transaction, index) => {
-              const { description, transactionAmount, transactionType } =
+              const { description, transactionAmount, transactionType, id } =
                 transaction;
               return (
-                <li
-                  key={description}
-                  className={index % 2 === 0 ? "even" : "odd"}
-                >
-                  <h4 className="list-item-title">{description}</h4>
-                  <p className="list-item-p">
-                    £{transactionAmount} •{" "}
-                    <label
-                      style={{
-                        color: transactionType === "expense" ? "red" : "green",
-                      }}
-                    >
-                      {transactionType}
-                    </label>
-                  </p>
+                <li key={id} className={index % 2 === 0 ? "even" : "odd"}>
+                  <div className="list-item-info-div">
+                    <h4 className="list-item-title">{description}</h4>
+                    <p className="list-item-p">
+                      £{transactionAmount} •{" "}
+                      <label
+                        style={{
+                          color:
+                            transactionType === "expense" ? "red" : "green",
+                        }}
+                      >
+                        {transactionType}
+                      </label>
+                    </p>
+                  </div>
+                  <div className="list-item-checkbox-div">
+                    <input
+                      type="checkbox"
+                      id={`checkbox-${id}`}
+                      checked={checkedItems.includes(id)}
+                      onChange={() => handleCheckboxChange(id)}
+                    />
+                  </div>
                 </li>
               );
             })}
@@ -141,4 +186,7 @@ export const ExpenseTracker = () => {
 
 // TODO:
 // 1) Add Snackbar pop up for successful sign out
+// 3) Move delete document function to its own useRemoveTransactions.js hook
+
+// COMPLETE
 // 2) User ability to delete transactions
