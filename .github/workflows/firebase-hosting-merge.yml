@@ -10,6 +10,9 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Clear npm cache
+        run: npm cache clean -f
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -17,7 +20,7 @@ jobs:
 
       - name: Install npx and firebase-tools
         run: |
-          npm install -g firebase-tools
+          npm install -g firebase-tools@latest
           npm install -g npx --force
 
       - name: Cache dependencies
