@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install npx and firebase-tools
+        run: npm install -g npx firebase-tools
+
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
@@ -29,9 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Use full path to npx
-        run: /usr/local/bin/npx firebase deploy --only hosting --token "${{ secrets.FIREBASE_SERVICE_ACCOUNT_EXPENSE_TRACKER_A8996 }}"
-      - uses: actions/checkout@v3
+      - name: Deploy to firebase hosting
+        run: npm exec firebase deploy --only hosting --token "${{ secrets.FIREBASE_SERVICE_ACCOUNT_EXPENSE_TRACKER_A8996 }}"
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
