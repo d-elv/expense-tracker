@@ -4,9 +4,16 @@ import { useAddTransaction } from "../../hooks/useAddTransaction.js";
 import { useGetTransactions } from "../../hooks/useGetTransactions.js";
 import { useGetUserInfo } from "../../hooks/useGetUserInfo.js";
 import { signOut } from "firebase/auth";
-import { deleteDoc, doc } from "firebase/firestore";
-import { auth, db } from "../../config/firebase-config.js";
+
+import { auth } from "../../config/firebase-config.js";
 import { useNavigate } from "react-router-dom";
+import { useRemoveTransaction } from "../../hooks/useRemoveTransaction.js";
+
+const getDayWithOrdinalSuffix = (day) => {
+  const suffixes = ["th", "st", "nd", "rd"];
+  const relevantDigits = (day > 3 && day < 21) || day % 10 > 3 ? 0 : day % 10;
+  return `${day}${suffixes[relevantDigits]}`;
+};
 
 export const ExpenseTracker = () => {
   const { name, profilePhoto, isAuth } = useGetUserInfo();
@@ -58,12 +65,21 @@ export const ExpenseTracker = () => {
   };
 
   const handleRemoveCheckedItems = async () => {
-    await Promise.all(
-      checkedItems.map(async (documentId) => {
-        const itemRef = doc(db, "transactions", documentId);
-        await deleteDoc(itemRef);
-      })
+    useRemoveTransaction(checkedItems);
+  };
+
+  const formatDate = (firebaseTimestamp) => {
+    const dateTime = firebaseTimestamp.toDate().toLocaleString("en-GB", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const dayWithSuffix = getDayWithOrdinalSuffix(
+      firebaseTimestamp.toDate().getDate()
     );
+    const finalFormattedDate = `${dayWithSuffix} ${dateTime.slice(2)}`;
+    return finalFormattedDate;
   };
 
   return (
@@ -152,13 +168,22 @@ export const ExpenseTracker = () => {
         <div className="transaction-container">
           <h2 className="transactions-title">Transactions</h2>
           <ul className="transaction-list">
-            {transactions.map((transaction, index) => {
-              const { description, transactionAmount, transactionType, id } =
-                transaction;
+            {transactions.toReversed().map((transaction, index) => {
+              const {
+                description,
+                transactionAmount,
+                transactionType,
+                id,
+                createdAt,
+              } = transaction;
+              const formattedDate = formatDate(createdAt);
               return (
                 <li key={id} className={index % 2 === 0 ? "even" : "odd"}>
                   <div className="list-item-info-div">
-                    <h4 className="list-item-title">{description}</h4>
+                    <h4 className="list-item-title">
+                      <span className="bold">{description}</span> -{" "}
+                      {formattedDate}
+                    </h4>
                     <p className="list-item-p">
                       £{transactionAmount} •{" "}
                       <label
@@ -191,8 +216,9 @@ export const ExpenseTracker = () => {
 
 // TODO:
 // 1) Add Snackbar pop up for successful sign out
-// 3) Move delete document function to its own useRemoveTransactions.js hook
-// 4) If you are directed to /expense-tracker without being logged in, you get a 404
 
 // COMPLETE
 // 2) User ability to delete transactions
+// 3) Move delete document function to its own useRemoveTransactions.js hook
+// 4) If you are directed to /expense-tracker without being logged in, you now get redirected to the login page
+// 5) Add Date & Time to expenses
